@@ -22,6 +22,8 @@ Vue.use(IconsPlugin)
 
 
 const routes = [
+    { path: '/product/add', name: 'product_add', component: require('./components/Product/FormComponent.vue').default },
+    { path: '/product/edit/:id', name: 'product_edit', component: require('./components/Product/FormComponent.vue').default, props: true },
     { path: '/category', name: 'category_list', component: require('./components/Category/ListComponent.vue').default },
     { path: '/category/add', name: 'product_add', component: require('./components/category/FormComponent.vue').default },
     { path: '/category/edit/:id', name: 'product_edit', component: require('./components/category/FormComponent.vue').default, props: true },
