@@ -9,6 +9,8 @@ class Category extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['id', 'name'];
+
     /**
      * Category can belong to one category parent
      *
