@@ -9,6 +9,8 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['id', 'name', 'description', 'price'];
+
     /**
      * Product can belong to one category
      *
