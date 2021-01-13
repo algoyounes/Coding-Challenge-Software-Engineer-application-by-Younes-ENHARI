@@ -12,7 +12,7 @@
   - CRUD (Create / Read / Update / Delete) Product 
   - CRUD (Create / Read / Update / Delete) Category
   - CLI Commands
-  – Unit Testing
+  - Unit Testing
 
 ### Installation
 
