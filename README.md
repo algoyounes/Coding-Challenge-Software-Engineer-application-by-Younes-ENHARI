@@ -9,9 +9,12 @@
 
 ### Features
 
-  - CRUD (Create / Read / Update / Delete) Product 
-  - CRUD (Create / Read / Update / Delete) Category
   - CLI Commands
+  - Web :
+    - CRUD (Create / Read / Update / Delete) Product
+    - CRUD (Create / Read / Update / Delete) Category
+    - Sort by (name, price)
+    - Filter by (name, price)
   - Unit Testing
 
 ### Installation
