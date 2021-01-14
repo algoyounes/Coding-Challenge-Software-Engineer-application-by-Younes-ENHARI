@@ -4,9 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Services\CategoryService;
 
 class CategoryController extends Controller
 {
+
+    protected $categoryService;
+
+    public function __construct(CategoryService $categoryService) {
+        $this->categoryService = $categoryService;
+    }
 
     /**
      * Display a listing of the resource.
@@ -15,7 +22,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Category::with('parent')->get();
+        $this->categoryService->getAll();
     }
 
     /**
@@ -26,16 +33,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $category = new Category;
-        $category->name = $request->input('name');
-
-        if($request->filled('parent_id')){
-            $category_parent = Category::find($request->input('parent_id'));
-            $category->parent()->associate($category_parent);
-        }
-
-        $category->save();
-        return response()->json($category, 201);
+        $this->categoryService->storeData($request);
     }
 
     /**
@@ -46,7 +44,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        return Category::find($id);
+        $this->categoryService->getById($id);
     }
 
     /**
@@ -58,16 +56,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $category = Category::find($id);
-        $category->name = $request->input('name');
-
-        if($request->filled('parent_id') && $request->input('parent_id') != $category->parent_id){
-            $category_parent = Category::find($request->input('parent_id'));
-            $category->parent()->associate($category_parent);
-        }
-
-        $category->save();
-        return response()->json($category, 200);
+        $this->categoryService->editData($request, $id);
     }
 
     /**
@@ -78,10 +67,7 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $category = Category::findOrFail($id);
-        $category->delete();
-
-        return response()->json(null, 204);
+        $this->categoryService->deleteById($id);
     }
 
 }

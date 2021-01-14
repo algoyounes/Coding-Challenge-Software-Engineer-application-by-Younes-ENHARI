@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Services\ProductService;
 
 class ProductController extends Controller
 {
+
+    protected $productService;
+
+    public function __construct(ProductService $productService) {
+        $this->productService = $productService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,8 +23,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-
-        return Product::with('categories')->get();
+        $this->productService->getAll();
     }
 
     /**
@@ -37,22 +44,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $product = new Product;
-
-        $product->name = $request->input('name');
-        $product->description = $request->input('description');
-        $product->price = $request->input('price');
-
-        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-            $product->image = $this->productImage($request->photo);
-        }
-
-        $product->save();
-
-        $category_ids = explode(",", $request->input('category_id'));
-        $product->categories()->attach($category_ids);
-
-        return response()->json($product, 201);
+        $this->productService->storeData($request);
     }
 
     /**
@@ -75,23 +67,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
-
-        $product->name = $request->input('name');
-        $product->description = $request->input('description');
-        $product->price = $request->input('price');
-
-        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-            $product->image = $this->productImage($request->photo);
-        }
-
-        if($request->filled('category_id')){
-            $product->categories()->sync($request->input('category_id'));
-        }
-
-        $product->save();
-
-        return response()->json($product, 200);
+        $this->productService->editData($request, $id);
     }
 
     /**
@@ -100,23 +76,9 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $product = Product::findOrFail($id);
-        $product->delete();
-
-        return response()->json(null, 204);
+    public function destroy($id){
+        $this->productService->deleteById($id);
     }
 
-    /**
-     * Store a newly product image.
-     *
-     */
-    public function productImage($image)
-    {
-        $path = $image->store('products');
-
-        return 'storage/'.$path;
-    }
 }
 
