@@ -64,4 +64,13 @@ class AddCategory extends Command
         return 1;
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function parentExist($id): ?Model
+    {
+        return $this->categoryService->find($id);
+    }
+
 }
