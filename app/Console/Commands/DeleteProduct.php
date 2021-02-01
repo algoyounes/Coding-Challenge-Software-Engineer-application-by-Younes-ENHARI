@@ -13,7 +13,7 @@ class DeleteProduct extends Command
      * @var string
      */
     protected $signature = 'product:delete
-                            {id* : The IDs of the product(s) to delete.}';
+                            {id : The ID of the product to delete.}';
 
     /**
      * The console command description.

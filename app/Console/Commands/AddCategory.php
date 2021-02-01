@@ -13,7 +13,7 @@ class AddCategory extends Command
      *
      * @var string
      */
-    protected $signature = 'category:create {name_Category} {id_parent?}';
+    protected $signature = 'category:create {name} {parent_id?}';
 
     /**
      * The console command description.
