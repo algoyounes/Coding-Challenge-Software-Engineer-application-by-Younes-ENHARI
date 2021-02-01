@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Category;
 use Illuminate\Console\Command;
+use App\Services\ICategoryService;
 
 class DeleteCategory extends Command
 {
@@ -22,6 +23,11 @@ class DeleteCategory extends Command
     protected $description = 'Command description';
 
     /**
+     * @var ICategoryService
+     */
+    protected $categoryService;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -34,14 +40,22 @@ class DeleteCategory extends Command
     /**
      * Execute the console command.
      *
+     * @param ICategoryService $categoryService
      * @return int
      */
-    public function handle()
+    public function handle(ICategoryService $categoryService)
     {
+        $this->categoryService = $categoryService;
+
         $id = $this->argument('id');
-
-        $Category = Category::find($id);
-
-        $Category->delete();
+        $res = $categoryService->delete($id);
+        if ($res === 0) {
+            $this->error("Category with ID ".implode(', ', $id)." does not exist.");
+            $this->info("deleted rows: {$res}");
+            return 0;
+        }
+        $this->info("Category with ID ".implode(', ', $id)." has been deleted.");
+        $this->info("deleted rows: {$res}");
+        return 0;
     }
 }

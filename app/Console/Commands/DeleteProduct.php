@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\Product;
+use App\Services\IProductService;
 
 class DeleteProduct extends Command
 {
@@ -12,14 +12,20 @@ class DeleteProduct extends Command
      *
      * @var string
      */
-    protected $signature = 'command:deleteProduct {id} ';
+    protected $signature = 'product:delete
+                            {id* : The IDs of the product(s) to delete.}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Delete a specific produc';
+    protected $description = 'Delete a specific product';
+
+    /**
+     * @var IProductService
+     */
+    protected $productService;
 
     /**
      * Create a new command instance.
@@ -34,13 +40,22 @@ class DeleteProduct extends Command
     /**
      * Execute the console command.
      *
+     * @param IProductService $productService
      * @return int
      */
-    public function handle()
+    public function handle(IProductService $productService)
     {
-        $id = $this->argument('id');
-        $Product = Product::findOrFail($id);
+        $this->productService = $productService;
 
-        $Product->delete();
+        $id = $this->argument('id');
+        $res = $productService->delete($id);
+        if ($res === 0) {
+            $this->error("Product with ID ".implode(', ', $id)." does not exist.");
+            $this->info("deleted rows: {$res}");
+            return 0;
+        }
+        $this->info("Product(s) with ID ".implode(', ', $id)." has been deleted.");
+        $this->info("deleted rows: {$res}");
+        return 0;
     }
 }
