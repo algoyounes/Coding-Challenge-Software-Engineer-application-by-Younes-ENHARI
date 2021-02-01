@@ -60,7 +60,7 @@
 
             <b-form-group id="input-group-4" label="Product image:" label-for="image">
                 <b-form-file
-                    v-model="form.photo"
+                    v-model="form.image"
                     placeholder="Choose a file or drop it here..."
                     drop-placeholder="Drop file here..."
                     accept="image/jpeg, image/png, image/gif"
@@ -85,7 +85,7 @@
                 form: {
                     name: '',
                     description: '',
-                    photo : [],
+                    image : [],
                     category_id: []
                 },
                 alert: {
@@ -122,7 +122,7 @@
                 formData.append("description", this.form.description);
                 formData.append("price", this.form.price);
                 formData.append("category_id", this.form.category_id);
-                formData.append("photo", this.form.photo);
+                formData.append("image", this.form.image);
 
                 if (this.id == null){
                     this.addNewProduct(formData)
@@ -135,7 +135,7 @@
                     name: '',
                     description: '',
                     price: '',
-                    photo: '',
+                    image: '',
                     category_id: []
                 }
             },
