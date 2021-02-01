@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Services\ProductService;
+use App\Http\Resources\Product;
+use App\Services\IProductService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
 
     protected $productService;
 
-    public function __construct(ProductService $productService) {
+    public function __construct(IProductService $productService)
+    {
         $this->productService = $productService;
     }
 
@@ -33,18 +35,31 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return Category::doesntHave('parent')->get();
+        return $this->productService->getAllParents();
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
-        $this->productService->storeData($request);
+
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'max:255'],
+            'description' => ['max:255'],
+            'price' => ['required', 'numeric', 'between:0,999999.99'],
+            'image' => ['required', 'image']
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toArray(), 422);
+        }
+
+        $result = $this->productService->create($request);
+
+        return (new Product($result))->response()->setStatusCode(201);
     }
 
     /**
@@ -55,7 +70,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        return Product::with('categories')->find($id);
+        return $this->productService->show($id);
     }
 
     /**
@@ -67,7 +82,8 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->productService->editData($request, $id);
+        $a = $this->productService->update($request, $id);
+        return response()->setStatusCode(200);
     }
 
     /**
@@ -76,8 +92,9 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id){
-        $this->productService->deleteById($id);
+    public function destroy($id)
+    {
+        $this->productService->delete($id);
     }
 
 }

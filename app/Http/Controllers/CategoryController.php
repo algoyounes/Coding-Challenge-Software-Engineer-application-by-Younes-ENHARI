@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Category;
-use App\Services\CategoryService;
+use App\Http\Resources\Category;
+use App\Services\ICategoryService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
 
-    protected $categoryService;
+    private $categoryService;
 
-    public function __construct(CategoryService $categoryService) {
+    /**
+     * CategoryController constructor.
+     * @param ICategoryService $categoryService
+     */
+    public function __construct(ICategoryService $categoryService)
+    {
         $this->categoryService = $categoryService;
     }
 
@@ -28,12 +35,24 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
-        $this->categoryService->storeData($request);
+
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'max:255'],
+            'parent_id' => ['required', 'numeric', 'exists:App\Models\Category,id'],
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toArray(), 422);
+        }
+
+        $data = $request->only(['name', 'parent_id']);
+        $result = $this->categoryService->create($data);
+
+        return (new Category($result))->response()->setStatusCode(201);
     }
 
     /**
@@ -44,7 +63,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $this->categoryService->getById($id);
+        $this->categoryService->find($id);
     }
 
     /**
@@ -56,7 +75,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->categoryService->editData($request, $id);
+        $data = $request->only(['name', 'parent_id']);
+        $hasUpdated = $this->categoryService->update($data, $id);
+        return response()->setStatusCode(200);
     }
 
     /**
@@ -67,7 +88,8 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $this->categoryService->deleteById($id);
+        $this->categoryService->delete($id);
+        return response()->setStatusCode(204);
     }
 
 }
