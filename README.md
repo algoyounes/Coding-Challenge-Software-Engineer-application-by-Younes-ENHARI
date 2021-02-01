@@ -1,8 +1,13 @@
 # Coding Challenge - Laravel / VueJs
 ---
-### Tech Specification
 
-  - Laravel 8
+## About
+
+This application is a demo app for the coding challenge provided by Nextmedia to evaluate the coding skills of developers and software engineers.
+
+### Used technologies
+
+  - Laravel 8 / php 7.3
   - Vue 2 + VueRouter
   - Vue-bootstrap
   - CLI costume commands
@@ -43,10 +48,21 @@ Verify the deployment by navigating to your server address in your preferred bro
 127.0.0.1:8000
 ```
 
-to use CLI commande for Delete or ADD (Product/Category)
-```sh
-    $ php artisan command:AddProduct ProductName ProductDescription price category_id path_img
-    $ php artisan command:deleteProduct id_Product
-    $ php artisan command:AddCategory CategoryName ParentCategoty_id/Optionelle
-    $ php artisan command:deleteCategory id_Category
-```
+## Command Line:
+
+### Create and delete categories.
+@ To create a new category that has a parent relation run this command:
+- `php artisan category:create CATEGORY_NAME CATEGORY_PARENT_ID`
+
+@ To create a new category without a parent relation run this command: 
+- `php artisan category:create CATEGORY_NAME`
+
+@ To delete a category run this command:
+- `php artisan category:delete CATEGORY_ID`
+
+### Create and delete products.
+@ To create a new product run this command:
+- `artisan product:create --name=NAME --description=DESCRIPTION --price=PRICE --category_id=CATEGORY_ID --image="/FULL/PATH/TO/IMAGE.EXT"`
+
+@ To delete an existing product:
+- `artisan product:delete PRODUCT_ID`
