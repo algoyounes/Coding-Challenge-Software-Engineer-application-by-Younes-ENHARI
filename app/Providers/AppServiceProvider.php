@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Services\ICategoryService;
+use App\Services\Impl\CategoryService;
+use App\Services\Impl\ProductService;
+use App\Services\IProductService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,5 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
+        $this->app->bind(IProductService::class, ProductService::class);
+        $this->app->bind(ICategoryService::class, CategoryService::class);
     }
 }
