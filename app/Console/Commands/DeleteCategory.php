@@ -13,14 +13,14 @@ class DeleteCategory extends Command
      *
      * @var string
      */
-    protected $signature = 'command:DeleteCategory {id}';
+    protected $signature = 'category:delete {id}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Delete a specific category';
 
     /**
      * @var ICategoryService

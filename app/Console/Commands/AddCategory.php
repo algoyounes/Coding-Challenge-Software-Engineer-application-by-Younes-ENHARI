@@ -13,14 +13,14 @@ class AddCategory extends Command
      *
      * @var string
      */
-    protected $signature = 'command:AddCategory {name_Category} {id_parent?}';
+    protected $signature = 'category:create {name_Category} {id_parent?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command Add New Category';
+    protected $description = 'Create a new category';
 
     /**
      * @var ICategoryService
