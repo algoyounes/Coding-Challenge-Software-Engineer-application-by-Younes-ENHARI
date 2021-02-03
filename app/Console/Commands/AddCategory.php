@@ -30,47 +30,36 @@ class AddCategory extends Command
     /**
      * Create a new command instance.
      */
-    public function __construct()
+    public function __construct(ICategoryService $categoryService)
     {
         parent::__construct();
-
+        $this->categoryService = $categoryService;
     }
 
     /**
      * Execute the console command.
      *
-     * @param ICategoryService $categoryService
      * @return int
      */
-    public function handle(ICategoryService $categoryService): int
+    public function handle(): int
     {
-        $this->categoryService = $categoryService;
         $name = $this->argument('name');
         $parent_id = $this->argument('parent_id');
 
-        if ($parent_id && !$this->parentExist($parent_id)) {
+        if ($parent_id && !$this->categoryService->find($parent_id)) {
             $this->error('Parent is not exist!');
             return 1;
         }
 
-        $category = $categoryService->create(['name' => $name, 'parent' => $parent_id]);
+        $category = $this->categoryService->create(['name' => $name, 'parent' => $parent_id]);
 
         if ($category) {
             $this->info("Category {$name} created successfully.");
             return 0;
         }
-        var_dump($category);
+
         $this->error("Something went wrong!");
         return 1;
-    }
-
-    /**
-     * @param $id
-     * @return bool
-     */
-    public function parentExist($id): ?Model
-    {
-        return $this->categoryService->find($id);
     }
 
 }

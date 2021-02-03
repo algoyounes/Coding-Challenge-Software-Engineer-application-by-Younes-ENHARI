@@ -38,30 +38,28 @@ class AddProduct extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(IProductService $productService)
     {
         parent::__construct();
+        $this->productService = $productService;
     }
 
     /**
      * Execute the console command.
      *
-     * @param IProductService $productService
      * @return int
      */
-    public function handle(IProductService $productService)
+    public function handle()
     {
-        $this->productService = $productService;
-        $product = collect($this->options())->only(['name', 'description', 'price', 'category_id', 'image'])->all();
+        $data = collect($this->options())->only(['name', 'description', 'price', 'category_id', 'image'])->all();
 
-        if (!$this->validate($product)) {
+        if (!$this->validate($data)) {
             return 1;
         }
 
-        $request = new Request($product);
-        $productService->create($request);
+        $productService->create($data);
 
-        $this->info("Product {$product['name']} created successfully.");
+        $this->info("Product {$data['name']} created successfully.");
         return 0;
     }
 

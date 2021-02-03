@@ -25,7 +25,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $this->productService->getAll();
+        return $this->productService->getAll();
     }
 
     /**
@@ -51,13 +51,20 @@ class ProductController extends Controller
             'name' => ['required', 'max:255'],
             'description' => ['max:255'],
             'price' => ['required', 'numeric', 'between:0,999999.99'],
-            'image' => ['required', 'image']
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors()->toArray(), 422);
         }
 
-        $result = $this->productService->create($request);
+        $data = $request->only(['name', 'description', 'price', 'category_id', 'image']);
+        
+        if($data["image"] == NULL){
+            unset($data["image"]);
+        }else{
+            $data["image"] = $this->productImage(trim($data['image']));
+        }
+
+        $result = $this->productService->create($data);
 
         return (new Product($result))->response()->setStatusCode(201);
     }
@@ -68,7 +75,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         return $this->productService->show($id);
     }
@@ -80,9 +87,13 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
-        $a = $this->productService->update($request, $id);
+
+        $data = $request->only(['name', 'description', 'price', 'image']);
+        $data["image"] = $this->productImage($data["image"]);
+
+        $a = $this->productService->update($data, $id);
         return response()->setStatusCode(200);
     }
 
@@ -92,9 +103,21 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $this->productService->delete($id);
+    }
+
+    /**
+     * Store a newly product image.
+     *
+     * @param  string $image
+     * @return string
+     */
+    public function productImage($image)
+    {
+        $path = $image->store('products');
+        return 'storage/'.$path;
     }
 
 }

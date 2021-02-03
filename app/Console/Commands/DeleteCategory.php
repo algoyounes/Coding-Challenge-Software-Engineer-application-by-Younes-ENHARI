@@ -32,23 +32,21 @@ class DeleteCategory extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(ICategoryService $categoryService)
     {
         parent::__construct();
+        $this->categoryService = $categoryService;
     }
 
     /**
      * Execute the console command.
      *
-     * @param ICategoryService $categoryService
      * @return int
      */
-    public function handle(ICategoryService $categoryService)
+    public function handle()
     {
-        $this->categoryService = $categoryService;
-
         $id = $this->argument('id');
-        $res = $categoryService->delete($id);
+        $res = $this->categoryService->delete($id);
         if ($res === 0) {
             $this->error("Category with ID ".implode(', ', $id)." does not exist.");
             $this->info("deleted rows: {$res}");

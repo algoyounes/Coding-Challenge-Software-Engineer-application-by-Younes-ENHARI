@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Impl;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Reponse;
@@ -14,28 +14,13 @@ class ProductRepository implements IProductRepository
 {
 
     /**
-     * @var Product
-     */
-    protected $model;
-
-    /**
-     * ProductRepository constructor.
-     * @param Product $model
-     */
-    public function __construct(Product $model)
-    {
-        $this->model = $model;
-    }
-
-
-    /**
      * Display a listing of the Products.
      *
      * @return Response
      */
-    public function getAllProducts()
+    public function getAll()
     {
-        return $this->model->with('categories')->get();
+        return Product::with('categories')->get();
     }
 
     /**
@@ -45,7 +30,7 @@ class ProductRepository implements IProductRepository
      */
     public function getAllParents()
     {
-        return $this->model->doesntHave('parent')->get();
+        return Product::doesntHave('parent')->get();
     }
 
     /**
@@ -54,9 +39,9 @@ class ProductRepository implements IProductRepository
      * @param  int  $id
      * @return Response
      */
-    public function show($id)
+    public function show(int $id)
     {
-        return $this->model->with('categories')->find($id);
+        return Product::with('categories')->find($id);
     }
 
     /**
@@ -65,51 +50,45 @@ class ProductRepository implements IProductRepository
      * @param  int  $id
      * @return Model
      */
-    public function find($id)
+    public function find(int $id)
     {
-        return $this->model->find($id);
+        return Product::find($id);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
+     * @param  array  $data
      * @return Model
      */
-    public function store(Request $request)
+    public function create(array $data)
     {
+        $product = Product::create($data);
 
-        $product = $request->only(['name', 'description', 'price', 'category_id', 'image']);
-        $product["image"] = $this->productImage(trim($product['image']));
-
-        $data = $this->model->create($product);
-
-        if(is_array($product["category_id"]) && !empty($product["category_id"])){
-            $category_ids = explode(",", $product["category_id"]);
-            $data->categories()->attach($category_ids);
+        if(isset($data["category_id"]) && !empty($data["category_id"])){
+            $category_ids = explode(",", $data["category_id"]);
+            $product->categories()->attach($category_ids);
         }
 
-        return $data;
+        return $product;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request  $request
-     * @param  int  $id
+     * @param  array $data
+     * @param  int   $id
      * @return int
      */
-    public function update(Request $request, $id)
+    public function update(array $data, int $id)
     {
+        $product = Product::where("id", $id);
+        if(isset($data["image"]) && !empty($data["image"])){
+            $product->categories()->sync($data["image"]);
+        }
+        $product->update($data);
 
-        $product = $request->only(['name', 'description', 'price', 'photo']);
-        $product["photo"] = $this->productImage($product["photo"]);
-
-        $data = $this->model->where("id", $id);
-        $data->categories()->sync($request->input('category_id'));
-        $data->update($product);
-
-        return $data;
+        return $product;
     }
 
     /**
@@ -118,20 +97,10 @@ class ProductRepository implements IProductRepository
      * @param  int  $id
      * @return int
      */
-    public function delete($id)
+    public function delete(int $id)
     {
         $product = $this->find($id);
         return $product->delete($id);
-    }
-
-    /**
-     * Store a newly product image.
-     *
-     */
-    public function productImage($image)
-    {
-        $path = $image->store('products');
-        return 'storage/'.$path;
     }
 
 }

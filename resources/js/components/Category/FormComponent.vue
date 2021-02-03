@@ -59,7 +59,7 @@
         },
         methods: {
             init() {
-                axios.get(`/api/products/create`)
+                axios.get(`/api/categories`)
                         .then(res => {
                             this.categories = res.data
                         })

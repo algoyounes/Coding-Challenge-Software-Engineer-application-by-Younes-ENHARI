@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Impl;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Reponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\IProductService;
-use App\Repositories\ProductRepository;
+use App\Repositories\Impl\ProductRepository;
 
 class ProductService implements IProductService
 {
@@ -19,7 +19,6 @@ class ProductService implements IProductService
         $this->productRepository = $productRepository;
     }
 
-
     /**
      * Display a listing of the resource.
      *
@@ -27,7 +26,7 @@ class ProductService implements IProductService
      */
     public function getAll()
     {
-        return $this->productRepository->getAllProducts();
+        return $this->productRepository->getAll();
     }
 
     /**
@@ -43,32 +42,33 @@ class ProductService implements IProductService
     /**
      * Display category by id.
      *
-     * @param int $id
-     * @return json
+     * @param  int $id
+     * @return Model
      */
-    public function find($id){
+    public function find(int $id)
+    {
         return $this->productRepository->find($id);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param  array $product
      * @return Model
      */
-    public function create($request)
+    public function create(array $product)
     {
-        return $this->productRepository->store($request);
+        return $this->productRepository->create($product);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request  $request
-     * @param int $id
+     * @param  array $product
+     * @param  int   $id
      * @return int
      */
-    public function update(Request $request, $id)
+    public function update(array $product, int $id)
     {
         return $this->productRepository->update($request);
     }
@@ -79,7 +79,7 @@ class ProductService implements IProductService
      * @param  int  $id
      * @return int
      */
-    public function delete($id)
+    public function delete(int $id)
     {
         return $this->categoryRepository->delete($id);
     }

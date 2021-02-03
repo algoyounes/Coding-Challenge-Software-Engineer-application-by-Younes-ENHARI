@@ -29,7 +29,17 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $this->categoryService->getAll();
+        return $this->categoryService->getAll();
+    }
+
+    /**
+     * Send list of category of parent to add product page
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return $this->categoryService-> Category::doesntHave('parent')->get();
     }
 
     /**
@@ -43,13 +53,17 @@ class CategoryController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'max:255'],
-            'parent_id' => ['required', 'numeric', 'exists:App\Models\Category,id'],
+            //'parent_id' => ['numeric', 'exists:App\Models\Category,id'],
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors()->toArray(), 422);
         }
 
         $data = $request->only(['name', 'parent_id']);
+        if($data["parent_id"] == "null"){
+            unset($data["parent_id"]);
+        }
+
         $result = $this->categoryService->create($data);
 
         return (new Category($result))->response()->setStatusCode(201);

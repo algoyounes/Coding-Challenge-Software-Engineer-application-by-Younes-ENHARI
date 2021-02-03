@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Impl;
 
 use App\Repositories\ICategoryRepository;
 use App\Services\ICategoryService;
@@ -19,7 +19,6 @@ class CategoryService implements ICategoryService
         $this->categoryRepository = $categoryRepository;
     }
 
-
     /**
      * Display a listing of the resource.
      *
@@ -27,16 +26,16 @@ class CategoryService implements ICategoryService
      */
     public function getAll()
     {
-        return $this->categoryRepository->getAllCategories();
+        return $this->categoryRepository->getAll();
     }
 
     /**
      * Display category by id.
      *
      * @param int $id
-     * @return json
+     * @return Model
      */
-    public function find($id)
+    public function find(int $id)
     {
         return $this->categoryRepository->find($id);
     }
@@ -47,19 +46,19 @@ class CategoryService implements ICategoryService
      * @param array $category
      * @return Model
      */
-    public function create($category)
+    public function create(array $category)
     {
-        return $this->categoryRepository->store($category);
+        return $this->categoryRepository->create($category);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  array  $data
-     * @param int $id
+     * @param  array $data
+     * @param  int   $id
      * @return int
      */
-    public function update($category, $id)
+    public function update(array $category, int $id)
     {
         return $this->categoryRepository->update($category, $id);
     }
@@ -70,7 +69,7 @@ class CategoryService implements ICategoryService
      * @param  int $id
      * @return int
      */
-    public function delete($id)
+    public function delete(int $id)
     {
         return $this->categoryRepository->delete($id);
     }

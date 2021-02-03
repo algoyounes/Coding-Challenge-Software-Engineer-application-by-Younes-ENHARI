@@ -32,23 +32,21 @@ class DeleteProduct extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(IProductService $productService)
     {
         parent::__construct();
+        $this->productService = $productService;
     }
 
     /**
      * Execute the console command.
      *
-     * @param IProductService $productService
      * @return int
      */
-    public function handle(IProductService $productService)
+    public function handle()
     {
-        $this->productService = $productService;
-
         $id = $this->argument('id');
-        $res = $productService->delete($id);
+        $res = $this->productService->delete($id);
         if ($res === 0) {
             $this->error("Product with ID ".implode(', ', $id)." does not exist.");
             $this->info("deleted rows: {$res}");

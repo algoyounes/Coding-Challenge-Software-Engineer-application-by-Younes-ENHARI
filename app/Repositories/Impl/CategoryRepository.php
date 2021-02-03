@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Impl;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
@@ -10,47 +10,33 @@ class CategoryRepository implements ICategoryRepository
 {
 
     /**
-     * @var Category
-     */
-    protected $model;
-
-    /**
-     * CategoryRepository constructor.
-     * @param Category $model
-     */
-    public function __construct(Category $model)
-    {
-        $this->model = $model;
-    }
-
-    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function getAllCategories()
+    public function getAll()
     {
-        return $this->model->with("parent")->get();
+        return Category::with("parent")->get();
     }
 
     /**
      * Find category by id.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Model
      */
-    public function find($id)
+    public function find(int $id)
     {
-        return $this->model->find($id);
+        return Category::find($id);
     }
 
     /**
      * @param array $category
      * @return mixed
      */
-    public function store($category)
+    public function create(array $category)
     {
-        return $this->model->create($category);
+        return Category::create($category);
     }
 
     /**
@@ -60,9 +46,9 @@ class CategoryRepository implements ICategoryRepository
      * @param  int  $id
      * @return mixed
      */
-    public function update($category, $id)
+    public function update(array $category, int $id)
     {
-        return $this->model->where("id", $id)->update($category);
+        return Category::where("id", $id)->update($category);
     }
 
     /**
@@ -71,7 +57,7 @@ class CategoryRepository implements ICategoryRepository
      * @param  int  $id
      * @return int
      */
-    public function delete($id)
+    public function delete(int $id)
     {
         $category = $this->find($id);
         return $category->delete($id);

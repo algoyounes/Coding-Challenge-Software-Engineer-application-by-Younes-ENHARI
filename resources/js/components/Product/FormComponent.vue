@@ -96,8 +96,9 @@
         },
         methods: {
             init() {
-                axios.get(`/api/products/create`)
+                axios.get(`/api/categories`)
                         .then(res => {
+                            console.log(res.data);
                             this.categories = res.data
                         })
                         .catch(err => {});

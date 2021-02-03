@@ -7,6 +7,7 @@ use App\Services\Impl\CategoryService;
 use App\Services\Impl\ProductService;
 use App\Services\IProductService;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
