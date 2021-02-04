@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use App\Services\ICategoryService;
-use App\Services\Impl\CategoryService;
-use App\Services\Impl\ProductService;
+use App\Services\Implement\CategoryService;
+use App\Services\Implement\ProductService;
 use App\Services\IProductService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
