@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Impl;
+namespace App\Repositories\Implement;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Reponse;
