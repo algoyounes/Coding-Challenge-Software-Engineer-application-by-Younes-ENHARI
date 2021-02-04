@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\Product;
 use App\Services\IProductService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -56,12 +57,11 @@ class ProductController extends Controller
             return response()->json($validator->errors()->toArray(), 422);
         }
 
-        $data = $request->only(['name', 'description', 'price', 'category_id', 'image']);
-        
-        if($data["image"] == NULL){
-            unset($data["image"]);
-        }else{
-            $data["image"] = $this->productImage(trim($data['image']));
+        $data = $request->only(['name', 'description', 'price', 'category_id']);
+
+        if($request->file("image") !== NULL){
+            $data["image"] = Storage::url($request->file('image')
+            ->storePubliclyAs('public/images', $request->file('image')->getClientOriginalName()));
         }
 
         $result = $this->productService->create($data);
@@ -77,7 +77,7 @@ class ProductController extends Controller
      */
     public function show(int $id)
     {
-        return $this->productService->show($id);
+        return $this->productService->find($id);
     }
 
     /**
@@ -90,11 +90,15 @@ class ProductController extends Controller
     public function update(Request $request, int $id)
     {
 
-        $data = $request->only(['name', 'description', 'price', 'image']);
-        $data["image"] = $this->productImage($data["image"]);
+        $data = $request->only(['name', 'description', 'price']);
+        if($request->file("image") !== NULL){
+            $data["image"] = Storage::url($request->file('image')
+            ->storePubliclyAs('public/images', $request->file('image')->getClientOriginalName()));
+        }
 
-        $a = $this->productService->update($data, $id);
-        return response()->setStatusCode(200);
+        $this->productService->update($data, $id);
+
+        return response()->json([ "message" => "Product has been updated !" ])->setStatusCode(200);
     }
 
     /**
@@ -106,18 +110,6 @@ class ProductController extends Controller
     public function destroy(int $id)
     {
         $this->productService->delete($id);
-    }
-
-    /**
-     * Store a newly product image.
-     *
-     * @param  string $image
-     * @return string
-     */
-    public function productImage($image)
-    {
-        $path = $image->store('products');
-        return 'storage/'.$path;
     }
 
 }
