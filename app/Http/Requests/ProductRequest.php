@@ -32,7 +32,7 @@ class ProductRequest extends FormRequest
             'description' => ['max:255'],
             'price' => ['required', 'numeric', 'between:0,999999.99'],
             'image' => ['required', 'image'],
-            'category_id' => ['required', 'numeric', 'exists:App\Models\Category,id'],
+            'category_id.*' => ['required', 'exists:App\Models\Category,id'],
         ];
     }
 }
