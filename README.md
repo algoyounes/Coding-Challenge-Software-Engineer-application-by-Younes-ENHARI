@@ -62,7 +62,7 @@ Verify the deployment by navigating to your server address in your preferred bro
 
 ### Create and delete products.
 @ To create a new product run this command:
-- `artisan product:create --name=NAME --description=DESCRIPTION --price=PRICE --category_id=CATEGORY_ID --image="/FULL/PATH/TO/IMAGE.EXT"`
+- `php artisan product:create --name=NAME --description=DESCRIPTION --price=PRICE --category_id=CATEGORY_ID --image="/FULL/PATH/TO/IMAGE.EXT"`
 
 @ To delete an existing product:
-- `artisan product:delete PRODUCT_ID`
+- `php artisan product:delete PRODUCT_ID`
