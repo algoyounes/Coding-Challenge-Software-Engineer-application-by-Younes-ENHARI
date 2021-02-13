@@ -121,7 +121,7 @@
             deleteProduct(product_id, index) {
                 axios.delete(`/api/products/${product_id}`)
                     .then(res => {
-                        if(res.status == 204){
+                        if(res.status == 200){
                             this.products.splice(index, 1)
                             this.init_products.splice(index, 1)
                             this.$refs[`showModal_${product_id}`].hide()
