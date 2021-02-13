@@ -3,10 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\IProductService;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
+use App\Services\ProductService;
 
 class AddProduct extends Command
 {
@@ -20,7 +17,7 @@ class AddProduct extends Command
                             {--description= : The description of the product}
                             {--price= : The price of the product}
                             {--category_id= : The category ID of the product}
-                            {--photo= : The image absolute path of the product image Ex: /home/sammy/images/iphone.png }';
+                            {--image= : The image absolute path of the product image Ex: /home/sammy/images/iphone.png }';
     /**
      * The console command description.
      *
@@ -29,16 +26,16 @@ class AddProduct extends Command
     protected $description = 'Add New Product';
 
     /**
-     * @var IProductService
+     * @var ProductService
      */
     protected $productService;
 
     /**
      * Create a new command instance.
-     *
+     * @param ProductService $productService
      * @return void
      */
-    public function __construct(IProductService $productService)
+    public function __construct(ProductService $productService)
     {
         parent::__construct();
         $this->productService = $productService;
@@ -47,63 +44,25 @@ class AddProduct extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
-    public function handle()
+    public function handle() : void
     {
         $data = collect($this->options())->only(['name', 'description', 'price', 'category_id', 'image'])->all();
 
-        if (!$this->validate($data)) {
-            return 1;
+        if (!$this->productService->validate($data)) {
+            $this->error('Some fields are not fielded correctly !');
+            return;
         }
 
-        $productService->create($data);
+        $upload_path = $this->productService->uploadImageCLI(trim($data['image']));
+        if (!$upload_path) {
+            $this->error('Cannot move the image to upload folder.');
+            return;
+        }
 
-        $this->info("Product {$data['name']} created successfully.");
-        return 0;
+        $data['image'] = $upload_path;
+        $res = $this->productService->create($data)->toArray();
+        $this->info("Product {$res['name']} created successfully.");
     }
-
-    public function validate($product): bool
-    {
-        $imageError = null;
-
-        $validator = Validator::make($product, [
-            'name' => ['required', 'max:255'],
-            'description' => ['max:255'],
-            'price' => ['required', 'numeric', 'between:0,999999.99'],
-            'category_id' => ['required', 'numeric', 'exists:App\Category,id'],
-        ]);
-
-        /**
-         * validate if the provided file --image is a valid image.
-         */
-        if ($product['image']) {
-            $allowedMimeTypes = ['image/jpeg','image/gif','image/png','image/bmp','image/svg+xml'];
-            if (File::exists(trim($product['image']))) {
-                $contentType = File::mimeType(trim($product['image']));
-                if(!in_array($contentType, $allowedMimeTypes, false)){
-                    $imageError = 'The file provided as an image is not a valid image';
-                } else {
-                    $imageError = 'The file provided is not exist';
-                }
-            }
-
-        }
-
-
-        if ($validator->fails()) {
-            $this->info('Product not created. See error messages below:');
-
-            foreach ($validator->errors()->all() as $error) {
-                $this->error($error);
-            }
-            if ($imageError) {
-                $this->error($imageError);
-            }
-            return false;
-        }
-        return true;
-    }
-
-
 }

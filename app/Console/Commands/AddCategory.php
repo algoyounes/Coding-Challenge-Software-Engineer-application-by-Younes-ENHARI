@@ -3,8 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\ICategoryService;
-use Illuminate\Database\Eloquent\Model;
+use App\Services\CategoryService;
 
 class AddCategory extends Command
 {
@@ -23,14 +22,15 @@ class AddCategory extends Command
     protected $description = 'Create a new category';
 
     /**
-     * @var ICategoryService
+     * @var CategoryService
      */
     protected $categoryService;
 
     /**
      * Create a new command instance.
+     * @param CategoryService $categoryService
      */
-    public function __construct(ICategoryService $categoryService)
+    public function __construct(CategoryService $categoryService)
     {
         parent::__construct();
         $this->categoryService = $categoryService;
@@ -39,27 +39,21 @@ class AddCategory extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
-    public function handle(): int
+    public function handle()
     {
         $name = $this->argument('name');
-        $parent_id = $this->argument('parent_id');
+        $parent_id = (int) $this->argument('parent_id');
 
         if ($parent_id && !$this->categoryService->find($parent_id)) {
             $this->error('Parent is not exist!');
-            return 1;
         }
 
-        $category = $this->categoryService->create(['name' => $name, 'parent' => $parent_id]);
-
-        if ($category) {
-            $this->info("Category {$name} created successfully.");
-            return 0;
+        $category = $this->categoryService->create(['name' => $name, 'parent_id' => $parent_id])->toArray();
+        if (sizeof($category) >= 1) {
+            return $this->info("Category {$name} created successfully.");
         }
-
         $this->error("Something went wrong!");
-        return 1;
     }
-
 }

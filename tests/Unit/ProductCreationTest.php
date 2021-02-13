@@ -7,10 +7,8 @@ use Tests\TestCase;
 use Faker\Factory;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Category;
-use App\Models\Product;
-use App\Services\ICategoryService;
-use App\Services\Implement\CategoryService;
-use App\Repositories\Implement\CategoryRepository;
+use App\Services\CategoryService;
+use App\Repositories\CategoryRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -28,7 +26,6 @@ class ProductCreationTest extends TestCase
         $this->faker = Factory::create();
         $this->categoryService = new CategoryService(new CategoryRepository(new Category()));
         parent::setUp();
-
     }
 
     /**

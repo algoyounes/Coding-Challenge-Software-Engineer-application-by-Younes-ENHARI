@@ -2,22 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoryRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\Category;
-use App\Services\ICategoryService;
+use App\Services\CategoryService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
-
+    /**
+     * @var CategoryService
+     */
     private $categoryService;
 
     /**
      * CategoryController constructor.
-     * @param ICategoryService $categoryService
+     * @param CategoryService $categoryService
      */
-    public function __construct(ICategoryService $categoryService)
+    public function __construct(CategoryService $categoryService)
     {
         $this->categoryService = $categoryService;
     }
@@ -25,85 +30,63 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function index()
     {
-        return $this->categoryService->getAll();
-    }
-
-    /**
-     * Send list of category of parent to add product page
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return $this->categoryService-> Category::doesntHave('parent')->get();
+        return $this->respondWithArray($this->categoryService->getAll()->toArray());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
+     * @param  CategoryRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'max:255'],
-            //'parent_id' => ['numeric', 'exists:App\Models\Category,id'],
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toArray(), 422);
-        }
-
-        $data = $request->only(['name', 'parent_id']);
-        if($data["parent_id"] == "null"){
-            unset($data["parent_id"]);
-        }
-
-        $result = $this->categoryService->create($data);
-
-        return (new Category($result))->response()->setStatusCode(201);
+        $result = $this->categoryService->create($request->validated())->toArray();
+        return $this->respondWithItem($result);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show(int $id)
     {
-        $this->categoryService->find($id);
+        return $this->respondWithItem($this->categoryService->find($id)->toArray());
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CategoryRequest $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, int $id)
     {
-        $data = $request->only(['name', 'parent_id']);
-        $hasUpdated = $this->categoryService->update($data, $id);
-        return response()->setStatusCode(200);
+        $res = $this->categoryService->update($request->validated(), $id);
+        if($res === 0) return $this->errorNotFound("Oops, this category doesn't exist !");
+
+        return $this->respondWithArray([ "message" => "Category updated successfuly" ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        $this->categoryService->delete($id);
-        return response()->setStatusCode(204);
+        $res = $this->categoryService->delete($id);
+        if (!$res) {
+            return $this->errorNotFound("Oops, this category doesn't exist !");
+        }
+        return $this->respondWithArray([ "message" => "Category deleted successfuly" ]);
     }
-
 }

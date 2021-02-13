@@ -52,7 +52,7 @@
                 </template>
 
                 <template v-slot:cell(image)="row" >
-                    <b-img thumbnail fluid width="60" :src="`${row.item.image}`" alt="Not rounded image"></b-img>
+                    <b-img thumbnail fluid height="60" width="60" :src="`${row.item.image}`" alt="Not rounded image"></b-img>
                 </template>
 
                 <template v-slot:cell(options)="row" >

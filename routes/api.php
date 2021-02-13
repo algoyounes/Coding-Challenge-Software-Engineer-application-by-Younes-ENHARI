@@ -18,4 +18,3 @@ Route::resources([
     'categories' => App\Http\Controllers\CategoryController::class,
     'products' =>  App\Http\Controllers\ProductController::class,
 ]);
-

@@ -36,6 +36,7 @@
         },
         data() {
             return {
+                init_categories: [],
                 categories: [],
                 fields: ['name',
                         { key: 'parent.name', label: 'Parent Category' },
@@ -55,6 +56,20 @@
                         })
                         .catch(err => {});
             },
+            deleteCategory(category_id, index) {
+                axios.delete(`/api/categories/${category_id}`)
+                    .then(res => {
+                        if(res.status == 200){
+                            this.categories.splice(index, 1)
+                            this.init_categories.splice(index, 1)
+                            this.$refs[`showModal_${category_id}`].hide()
+                            this.alert.status = true
+                            this.alert.message = "Category deleted seccessufly"
+                        }
+                    })
+                    .catch(err => {});
+            },
+
         }
     }
 </script>

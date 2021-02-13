@@ -59,12 +59,9 @@
             </b-form-group>
 
             <b-form-group id="input-group-4" label="Product image:" label-for="image">
-                <b-form-file
-                    v-model="form.image"
-                    placeholder="Choose a file or drop it here..."
-                    drop-placeholder="Drop file here..."
-                    accept="image/jpeg, image/png, image/gif"
-                ></b-form-file>
+                <input type="file" class="form-control"
+                    @change="onLoadFileChange"
+                />
             </b-form-group>
 
             <b-button type="submit" variant="primary">Submit</b-button>
@@ -82,10 +79,14 @@
         data() {
             return {
                 categories: [],
+                imageRules: [
+                    value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
+                ],
                 form: {
                     name: '',
                     description: '',
-                    image : [],
+                    image : null,
+                    file: null,
                     category_id: []
                 },
                 alert: {
@@ -95,11 +96,21 @@
             }
         },
         methods: {
+
+            onLoadFileChange(e){
+                console.log(e.target.files[0]);
+                this.form.image = e.target.files[0];
+                // let fileReader = new FileReader();
+                // fileReader.readAsDataURL(e.target.files[0]);
+                // fileReader.onload = (e) => {
+                //     this.form.image = e.target.result
+                // }
+            },
             init() {
                 axios.get(`/api/categories`)
                         .then(res => {
                             console.log(res.data);
-                            this.categories = res.data
+                            this.categories = res.data;
                         })
                         .catch(err => {});
 
@@ -125,9 +136,12 @@
                 formData.append("category_id", this.form.category_id);
                 formData.append("image", this.form.image);
 
+                console.log("data : ",this.form);
+
                 if (this.id == null){
                     this.addNewProduct(formData)
                 }else{
+                    formData.append("_method", "put");
                     this.updateProduct(formData)
                 }
             },
@@ -153,17 +167,20 @@
                             console.log('error', err)
                         });
             },
-            updateProduct() {
-                axios.put(`/api/products/${this.id}`, this.form)
-                        .then(res => {
-                            if(res.status == 200){
-                                this.alert.status = true
-                                this.alert.message = "Product updated with success"
-                            }
-                        })
-                        .catch(err => {
-                            console.log('error', err)
-                        });
+            updateProduct(formData) {
+                axios.post(`/api/products/${this.id}`, formData)
+                    .then(res => {
+                        if(res.status == 200){
+                            this.alert.status = true
+                            this.alert.message = "Product updated with success"
+                        }else{
+                            this.alert.status = false
+                            this.alert.message = "Somethings are not fielded correctly"
+                        }
+                    })
+                    .catch(err => {
+                        console.log('error', err)
+                    });
             },
         }
     }

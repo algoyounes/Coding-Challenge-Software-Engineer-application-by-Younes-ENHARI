@@ -77,7 +77,9 @@
                 let formData = new FormData();
 
                 formData.append("name", this.form.name);
-                formData.append("parent_id", this.form.parent_id);
+                if(this.form.parent_id !== null){
+                    formData.append("parent_id", this.form.parent_id);
+                }
 
                 if (this.id == null){
                     this.addNewCategory(formData)
