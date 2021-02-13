@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use TypeError;
-use Exception;
 
 class CategoryRepository
 {
@@ -28,7 +27,7 @@ class CategoryRepository
      * @param  int  $id
      * @return Model
      */
-    public function find(int $id)
+    public function find(int $id): Model
     {
         return Category::findOrfail($id);
     }
@@ -65,7 +64,7 @@ class CategoryRepository
     public function delete(int $id): bool
     {
         try{
-            $category = $this->find(10);
+            $category = $this->find($id);
             if($category) return $category->delete();
         }catch(ModelNotFoundException | TypeError $e){
             return false;
