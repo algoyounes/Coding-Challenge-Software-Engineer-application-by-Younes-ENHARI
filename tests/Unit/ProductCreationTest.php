@@ -5,7 +5,6 @@ namespace Tests\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Faker\Factory;
-use Illuminate\Support\Facades\Artisan;
 use App\Models\Category;
 use App\Services\CategoryService;
 use App\Repositories\CategoryRepository;
@@ -70,7 +69,6 @@ class ProductCreationTest extends TestCase
         $response->assertJson(['name' => ['The name field is required.']]);
 
         Storage::assertMissing('public/images/'.$imageName);
-
     }
 
     /** @test */
@@ -92,7 +90,6 @@ class ProductCreationTest extends TestCase
         $response->assertJson(['category_id' => ['The category id field is required.']]);
 
         Storage::assertMissing('public/images/'.$imageName);
-
     }
 
     /** @test */
@@ -109,12 +106,9 @@ class ProductCreationTest extends TestCase
             'category_id' => 1
         ]);
 
-
         $response->assertStatus(422);
         $response->assertJson(['price' => ['The price field is required.']]);
-
         Storage::assertMissing('public/images/'.$imageName);
-
     }
 
     /** @test  */
@@ -157,5 +151,4 @@ class ProductCreationTest extends TestCase
 
         Storage::assertMissing('public/images/'.$imageName);
     }
-
 }
