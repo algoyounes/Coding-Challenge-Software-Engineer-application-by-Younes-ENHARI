@@ -31,7 +31,7 @@ class Controller extends BaseController
      * @param int $statusCode Value to set
      * @return self
      */
-    public function setStatusCode($statusCode): self
+    public function setStatusCode(int $statusCode): self
     {
         $this->statusCode = $statusCode;
         return $this;
@@ -76,7 +76,7 @@ class Controller extends BaseController
      * @param string $message
      * @return JsonResponse
      */
-    public function errorNotFound($message = "Respond Not Found"): JsonResponse
+    public function errorNotFound(string $message = "Respond Not Found"): JsonResponse
     {
         return $this->setStatusCode(404)->respondWithError([ "error" => $message ]);
     }
