@@ -30,6 +30,7 @@ class AddCategory extends Command
     /**
      * Create a new command instance.
      * @param CategoryService $categoryService
+     * @return void
      */
     public function __construct(CategoryService $categoryService)
     {
