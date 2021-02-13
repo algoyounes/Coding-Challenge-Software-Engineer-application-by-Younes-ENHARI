@@ -49,12 +49,8 @@ class AddCategory extends Command
         try{
             $parent = $this->categoryService->find($parent_id);
             if($parent){
-                $category = $this->categoryService->create(['name' => $name, 'parent_id' => $parent_id])->toArray();
-                if (sizeof($category) >= 1) {
-                    $this->info("Category created successfully.");
-                    return;
-                }
-                $this->error("Something went wrong!");
+                $res = $this->categoryService->create(['name' => $name, 'parent_id' => $parent_id])->toArray();
+                $this->info("Category {$res['name']} created successfully.");
             }
         }catch(ModelNotFoundException $e){
             $this->error('Parent is not exist!');
