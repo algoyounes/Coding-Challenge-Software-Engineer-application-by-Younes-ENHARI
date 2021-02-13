@@ -46,7 +46,6 @@ class AddCategory extends Command
     {
         $name = $this->argument('name');
         $parent_id = (int) $this->argument('parent_id');
-
         try{
             $parent = $this->categoryService->find($parent_id);
             if($parent){
@@ -59,6 +58,5 @@ class AddCategory extends Command
         }catch(ModelNotFoundException $e){
             $this->error('Parent is not exist!');
         }
-
     }
 }
