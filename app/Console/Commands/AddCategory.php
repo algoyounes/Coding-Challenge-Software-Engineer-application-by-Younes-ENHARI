@@ -42,7 +42,7 @@ class AddCategory extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $name = $this->argument('name');
         $parent_id = (int) $this->argument('parent_id');
@@ -51,7 +51,8 @@ class AddCategory extends Command
             if($parent){
                 $category = $this->categoryService->create(['name' => $name, 'parent_id' => $parent_id])->toArray();
                 if (sizeof($category) >= 1) {
-                    return $this->info("Category {$name} created successfully.");
+                    $this->info("Category created successfully.");
+                    return;
                 }
                 $this->error("Something went wrong!");
             }
