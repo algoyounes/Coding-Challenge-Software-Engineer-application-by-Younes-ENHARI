@@ -76,7 +76,7 @@ class Controller extends BaseController
      * @param string $message
      * @return JsonResponse
      */
-    public function errorNotFound($message): JsonResponse
+    public function errorNotFound($message = "Respond Not Found"): JsonResponse
     {
         return $this->setStatusCode(404)->respondWithError([ "error" => $message ]);
     }
