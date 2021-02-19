@@ -5,12 +5,9 @@ namespace App\Repositories;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use TypeError;
 
 class CategoryRepository
 {
-
     /**
      * Display a listing of the resource.
      *
@@ -63,11 +60,6 @@ class CategoryRepository
      */
     public function delete(int $id): bool
     {
-        try{
-            $category = $this->find($id);
-            if($category) return $category->delete();
-        }catch(ModelNotFoundException | TypeError $e){
-            return false;
-        }
+        return Category::where('id', $id)->delete();
     }
 }

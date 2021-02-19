@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\ProductAvatarManager;
 use Illuminate\Console\Command;
 use App\Services\ProductService;
 
@@ -31,14 +32,21 @@ class AddProduct extends Command
     protected $productService;
 
     /**
+     * @var ProductAvatarManager
+     */
+    private $avatarManager;
+
+    /**
      * Create a new command instance.
      * @param ProductService $productService
      * @return void
      */
-    public function __construct(ProductService $productService)
+    public function __construct(ProductService $productService, ProductAvatarManager $avatarManager)
     {
         parent::__construct();
+
         $this->productService = $productService;
+        $this->avatarManager = $avatarManager;
     }
 
     /**
@@ -52,17 +60,19 @@ class AddProduct extends Command
 
         if (!$this->productService->validate($data)) {
             $this->error('Some fields are not fielded correctly !');
+
             return;
         }
 
-        $upload_path = $this->productService->uploadImageCLI(trim($data['image']));
-        if (!$upload_path) {
+        $uploadPath = $this->avatarManager->uploadImageCLI(trim($data['image']));
+        if (!$uploadPath) {
             $this->error('Cannot move the image to upload folder.');
+
             return;
         }
 
-        $data['image'] = $upload_path;
-        $res = $this->productService->create($data)->toArray();
-        $this->info("Product {$res['name']} created successfully.");
+        $data['image'] = $uploadPath;
+        $newProduct = $this->productService->create($data)->toArray();
+        $this->info("Product {$newProduct['name']} created successfully.");
     }
 }

@@ -3,13 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use App\Http\Resources\Category;
 use App\Services\CategoryService;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
@@ -21,6 +16,7 @@ class CategoryController extends Controller
     /**
      * CategoryController constructor.
      * @param CategoryService $categoryService
+     * @return void
      */
     public function __construct(CategoryService $categoryService)
     {
@@ -46,6 +42,7 @@ class CategoryController extends Controller
     public function store(CategoryRequest $request)
     {
         $result = $this->categoryService->create($request->validated())->toArray();
+
         return $this->respondWithItem($result);
     }
 
@@ -70,6 +67,7 @@ class CategoryController extends Controller
     public function update(CategoryRequest $request, int $id)
     {
         $res = $this->categoryService->update($request->validated(), $id);
+
         if($res === 0) return $this->errorNotFound("Oops, this category doesn't exist !");
 
         return $this->respondWithArray([ "message" => "Category updated successfuly" ]);
@@ -84,9 +82,11 @@ class CategoryController extends Controller
     public function destroy(int $id)
     {
         $res = $this->categoryService->delete($id);
+
         if (!$res) {
             return $this->errorNotFound("Oops, this category doesn't exist !");
         }
+
         return $this->respondWithArray([ "message" => "Category deleted successfuly" ]);
     }
 }

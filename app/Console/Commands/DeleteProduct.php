@@ -35,6 +35,7 @@ class DeleteProduct extends Command
     public function __construct(ProductService $productService)
     {
         parent::__construct();
+
         $this->productService = $productService;
     }
 
@@ -47,10 +48,13 @@ class DeleteProduct extends Command
     {
         $id = $this->argument('id');
         $res = $this->productService->delete($id);
+
         if (!$res) {
             $this->error("Product with ID ".$id." does not exist.");
+
             return;
         }
+
         $this->info("Product(s) with ID ".$id." has been deleted.");
     }
 }

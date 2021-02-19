@@ -2,16 +2,27 @@
 
 namespace App\Repositories;
 
-use Exception;
-use TypeError;
 use App\Models\Product;
-use Illuminate\Support\Facades\Storage;
+use App\Services\ProductAvatarManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductRepository
 {
+    /**
+     * @var ProductAvatarManager
+     */
+    private $avatarManager;
+
+    /**
+     * ProductRepository constructor
+     * @param ProductAvatarManager $avatarManager
+     * @return void
+     */
+    public function __construct(ProductAvatarManager $avatarManager)
+    {
+        $this->avatarManager = $avatarManager;
+    }
 
     /**
      * Display a listing of the Products.
@@ -42,7 +53,7 @@ class ProductRepository
      */
     public function find(int $id): Model
     {
-        return Product::findOrfail($id);
+        return Product::find($id);
     }
 
     /**
@@ -54,10 +65,12 @@ class ProductRepository
     public function create(array $data): Model
     {
         $product = Product::create($data);
-        if(isset($data["category_id"]) && !empty($data["category_id"])){
+
+        if (isset($data["category_id"]) && !empty($data["category_id"])) {
             $category_ids = explode(",", $data["category_id"]);
             $product->categories()->attach($category_ids);
         }
+
         return $product;
     }
 
@@ -70,17 +83,16 @@ class ProductRepository
      */
     public function update(array $data, int $id): int
     {
-        try{
-            $product = $this->find($id);
-            if(isset($data["category_id"]) && !empty($data["category_id"])){
-                $category_ids = explode(",", $data["category_id"]);
-                $product->categories()->sync($category_ids);
-            }
-            $product->update($data);
-            return $product;
-        }catch(ModelNotFoundException | TypeError $e){
-            return 0;
+        $product = $this->find($id);
+
+        if (!$product) return 0;
+
+        if (isset($data["category_id"]) && !empty($data["category_id"])) {
+            $category_ids = explode(",", $data["category_id"]);
+            $product->categories()->sync($category_ids);
         }
+
+        return $product->update($data);
     }
 
     /**
@@ -91,26 +103,12 @@ class ProductRepository
      */
     public function delete(int $id): bool
     {
-        try{
-            $product = $this->find($id);
-            if($product){
-                $this->deleteImageProduct($product->image);
-                return $product->delete();
-            }
-        }catch(ModelNotFoundException | TypeError $e){
-            return false;
-        }
-    }
+        $product = $this->find($id);
 
-    /**
-     * Remove the specified product image from storage.
-     *
-     * @param string $image
-     * @return void
-     */
-    public function deleteImageProduct(string $image): void
-    {
-        list($part1, $part2) = explode('/storage/', $image);
-        Storage::delete("/public/".$part2);
+        if (!$product) return false;
+
+        $this->avatarManager->deleteImageProduct($product->image);
+
+        return $product->delete();
     }
 }

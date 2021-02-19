@@ -2,16 +2,10 @@
 
 namespace App\Services;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Reponse;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\ProductRepository;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
-
 
 class ProductService
 {
@@ -93,37 +87,6 @@ class ProductService
     public function delete(int $id): bool
     {
         return $this->productRepository->delete($id);
-    }
-
-    /**
-     * Save image for provided product.
-     *
-     * @param UploadedFile $image
-     * @return string
-     */
-    public function uploadImage(UploadedFile $image): string
-    {
-        $link = Storage::url($image->storePubliclyAs('public', $image->getClientOriginalName()));
-        return $link;
-    }
-
-    /**
-     * Save image for provided product (CLI).
-     *
-     * @param string $products
-     * @return string|null
-     */
-    public function uploadImageCLI(string $path) : string
-    {
-        $db_path = '/'.basename(trim($path));
-        $public_path = 'public'.$db_path;
-        try {
-            Storage::put($public_path, File::get(trim($path)));
-            return ("/storage/".$db_path);
-        } catch (\Exception $exception) {
-            return $exception->getMessage();
-        }
-        return null;
     }
 
     /**

@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\DeleteProduct::class,
         Commands\AddProduct::class,
         Commands\DeleteCategory::class,
-        Commands\AddCategory::class
+        Commands\AddCategory::class,
     ];
 
     /**

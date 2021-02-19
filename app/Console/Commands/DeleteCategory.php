@@ -34,6 +34,7 @@ class DeleteCategory extends Command
     public function __construct(CategoryService $categoryService)
     {
         parent::__construct();
+
         $this->categoryService = $categoryService;
     }
 
@@ -46,10 +47,13 @@ class DeleteCategory extends Command
     {
         $id = $this->argument('id');
         $res = $this->categoryService->delete($id);
+
         if (!$res) {
             $this->error("Category with ID ".$id." doesn't exist.");
+
             return;
         }
+
         $this->info("Category with ID ".$id." has been deleted.");
     }
 }

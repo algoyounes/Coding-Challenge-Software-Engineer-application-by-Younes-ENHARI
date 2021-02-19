@@ -35,6 +35,7 @@ class AddCategory extends Command
     public function __construct(CategoryService $categoryService)
     {
         parent::__construct();
+
         $this->categoryService = $categoryService;
     }
 
@@ -46,14 +47,15 @@ class AddCategory extends Command
     public function handle(): void
     {
         $name = $this->argument('name');
-        $parent_id = (int) $this->argument('parent_id');
-        try{
-            $parent = $this->categoryService->find($parent_id);
-            if($parent){
-                $res = $this->categoryService->create(['name' => $name, 'parent_id' => $parent_id])->toArray();
-                $this->info("Category {$res['name']} created successfully.");
+        $parentId = (int) $this->argument('parent_id');
+
+        try {
+            $parent = $this->categoryService->find(20);
+            if ($parent) {
+                $newCategory = $this->categoryService->create(['name' => $name, 'parent_id' => $parentId])->toArray();
+                $this->info("Category {$newCategory['name']} created successfully.");
             }
-        }catch(ModelNotFoundException $e){
+        } catch(ModelNotFoundException $e) {
             $this->error('Parent is not exist!');
         }
     }

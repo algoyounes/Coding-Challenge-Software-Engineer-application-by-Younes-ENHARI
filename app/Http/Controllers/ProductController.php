@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Resources\Product;
 use App\Http\Requests\ProductRequest;
+use App\Services\ProductAvatarManager;
 use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
 
@@ -16,12 +15,18 @@ class ProductController extends Controller
     protected $productService;
 
     /**
+     * @var ProductAvatarManager
+     */
+    private $avatarManager;
+
+    /**
      * ProductController constructor.
      * @param ProductService $productService
      */
-    public function __construct(ProductService $productService)
+    public function __construct(ProductService $productService, ProductAvatarManager $avatarManager)
     {
         $this->productService = $productService;
+        $this->avatarManager = $avatarManager;
     }
 
     /**
@@ -43,8 +48,9 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         $data = $request->only(['name', 'description', 'price', 'category_id']);
-        $data["image"] = $this->productService->uploadImage($request->file("image"));
+        $data["image"] = $this->avatarManager->uploadImage($request->file("image"));
         $result = $this->productService->create($data)->toArray();
+
         return $this->respondWithItem($result);
     }
 
@@ -69,9 +75,11 @@ class ProductController extends Controller
     public function update(ProductRequest $request, int $id)
     {
         $data = $request->only(['name', 'description', 'price']);
-        $data["image"] = $this->productService->uploadImage($request->file("image"));
+        $data["image"] = $this->avatarManager->uploadImage($request->file("image"));
         $res = $this->productService->update($data, $id);
+
         if($res === 0) return $this->errorNotFound("Oops, this product doesn't exist !");
+
         return $this->respondWithArray([ "message" => "Product updated successfuly" ]);
     }
 
@@ -84,9 +92,11 @@ class ProductController extends Controller
     public function destroy(int $id)
     {
         $res = $this->productService->delete($id);
-        if(!$res){
+
+        if (!$res) {
             return $this->errorNotFound("Oops, this product doesn't exist !");
         }
+
         return $this->respondWithArray([ "message" => "Product deleted successfuly" ]);
     }
 }
