@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Exceptions\NullNameException;
 use Illuminate\Console\Command;
 use App\Services\CategoryService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -50,13 +51,15 @@ class AddCategory extends Command
         $parentId = (int) $this->argument('parent_id');
 
         try {
-            $parent = $this->categoryService->find($parentId);
-            if ($parent) {
-                $newCategory = $this->categoryService->create(['name' => $name, 'parent_id' => $parentId])->toArray();
-                $this->info("Category {$newCategory['name']} created successfully.");
-            }
+
+            $newCategory = $this->categoryService->create($name, $parentId)->toArray();
+            $this->info("Category {$newCategory['name']} created successfully.");
         } catch(ModelNotFoundException $e) {
-            $this->error('Parent is not exist!');
+
+            $this->error("ParentId is not exist !");
+        } catch(NullNameException $e) {
+
+            $this->error($e->getMessage());
         }
     }
 }

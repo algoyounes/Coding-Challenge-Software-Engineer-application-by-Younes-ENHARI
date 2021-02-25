@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Exceptions\NullNameException;
 use App\Repositories\CategoryRepository;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CategoryService
 {
@@ -45,14 +48,35 @@ class CategoryService
     }
 
     /**
-     * Store a newly created category in storage.
+     * Find Category by parentId
      *
-     * @param array $category
+     * @param int $id
      * @return Model
      */
-    public function create(array $category): Model
+    public function parentExist(int $id): Model
     {
-        return $this->categoryRepository->create($category);
+        return $this->categoryRepository->find($id);
+    }
+
+    /**
+     * Store a newly created category in storage.
+     *
+     * @throws ModelNotFoundException|NullNameException
+     * @param string $name
+     * @param int $parentId
+     * @return Model
+     */
+    public function create(string $name, int $parentId): Model
+    {
+        if (is_null($name) || $name === "null") {
+            throw new NullNameException();
+        }
+
+        if (!$this->parentExist($parentId)) {
+            throw new ModelNotFoundException();
+        }
+
+        return $this->categoryRepository->create([ "name" => $name, "parent_id" => $parentId ]);
     }
 
     /**

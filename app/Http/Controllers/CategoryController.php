@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NullNameException;
 use App\Http\Requests\CategoryRequest;
 use App\Services\CategoryService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
@@ -36,14 +39,24 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  CategoryRequest $request
+     * @param  Request $request
      * @return JsonResponse
      */
-    public function store(CategoryRequest $request)
+    public function store(Request $request)
     {
-        $result = $this->categoryService->create($request->validated())->toArray();
+        $data = $request->only(["name", "parent_id"]);
 
-        return $this->respondWithItem($result);
+        try {
+
+            $result = $this->categoryService->create($data["name"], $data["parent_id"])->toArray();
+            return $this->respondWithItem($result);
+        } catch (ModelNotFoundException $e) {
+
+            return $this->errorNotFound("ParentId is not exist !");
+        } catch (NullNameException $e) {
+
+            return $this->errorNotFound($e->getMessage());
+        }
     }
 
     /**
