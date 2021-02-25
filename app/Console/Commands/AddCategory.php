@@ -50,7 +50,7 @@ class AddCategory extends Command
         $parentId = (int) $this->argument('parent_id');
 
         try {
-            $parent = $this->categoryService->find(20);
+            $parent = $this->categoryService->find($parentId);
             if ($parent) {
                 $newCategory = $this->categoryService->create(['name' => $name, 'parent_id' => $parentId])->toArray();
                 $this->info("Category {$newCategory['name']} created successfully.");
